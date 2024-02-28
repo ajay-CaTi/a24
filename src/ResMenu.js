@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { restaurant_Url } from "../utils/data";
 import ShimmerUi from "./ShimmerUi";
-import ResMenuItem from "./ResMenuItem";
+// import ResMenuItem from "./ResMenuItem";
+import { useParams } from "react-router-dom";
 
-const ResMenu = ({ rId = 312 }) => {
+const ResMenu = () => {
   const [resInfo, setResInfo] = useState([]);
   const [resMenu, setResMenu] = useState([]);
+  let { id } = useParams();
+
   useEffect(() => {
     fetchMenu();
   }, []);
 
   let fetchMenu = async () => {
-    let data = await fetch(restaurant_Url + rId);
+    let data = await fetch(restaurant_Url + id);
     let json = await data.json();
-    // console.log(json);
+    console.log(restaurant_Url + id);
 
     setResMenu(
       json?.data?.cards[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards[2]?.card
@@ -54,7 +57,6 @@ const ResMenu = ({ rId = 312 }) => {
         json?.data?.cards[2]?.card?.card?.info ||
         json?.data?.cards[3]?.card?.card?.info
     );
-    // console.log(resInfo);
   };
 
   console.log(resMenu);
@@ -73,9 +75,17 @@ const ResMenu = ({ rId = 312 }) => {
         <p>{resInfo.sla.deliveryTime}</p>
       </div>
       <div>
-        {resMenu.map((val, i) => {
-          return <ResMenuItem data={val} key={i} />;
-        })}
+        <ul>
+          {resMenu.map((val, i) => {
+            return (
+              <li key={i}>
+                {val?.card?.info?.name} -₹
+                {val?.card?.info?.price / 100 ||
+                  val?.card?.info?.defaultPrice / 100}
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </div>
   );
