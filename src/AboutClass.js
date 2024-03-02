@@ -1,4 +1,5 @@
 import React from "react";
+import { UserCon } from "./UserCon";
 // import { git_API } from "../utils/data";
 
 class AboutClass extends React.Component {
@@ -56,6 +57,12 @@ class AboutClass extends React.Component {
         <img src={this.state.userInfo.avatar_url} width={"200px"} alt="avtar" />
         <h3>{this.state.userInfo.bio}</h3>
         <h3>{this.state.userInfo.public_repos}</h3>
+
+        <UserCon.Consumer>
+          {({ LoggedUser }) => {
+            return <p>{LoggedUser}</p>;
+          }}
+        </UserCon.Consumer>
 
         <h3>{this.state.count}</h3>
         <button

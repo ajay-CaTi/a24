@@ -6,6 +6,9 @@ export let restaurant_Url =
 
 export let git_API = "https://api.github.com/users/ajay-CaTi";
 
+export const url =
+  "https://www.swiggy.com/dapi/restaurants/list/v5?lat=12.9351929&lng=77.62448069999999";
+
 export let restaurants = [
   {
     info: {

@@ -1,13 +1,23 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 // import { restaurants } from "../utils/data";
-import RestaurantCard from "./RestaurantCard";
+import RestaurantCard, { withPromotedLabel } from "./RestaurantCard";
 import ShimmerUi from "./ShimmerUi";
 import { Link } from "react-router-dom";
+import useStatus from "../utils/useStatus";
+import { url } from "../utils/data";
+import { UserCon } from "./UserCon";
 
 const Body = () => {
   const [listOfRestaurants, setListOfRestaurants] = useState([]);
   const [filterRestaurants, setFilterRestaurants] = useState([]);
   const [searchText, setSearchText] = useState("");
+
+  let { LoggedUser, setUserName } = useContext(UserCon);
+
+  const ResCardPromoted = withPromotedLabel(RestaurantCard);
+
+  let onlinestatus = useStatus();
+  console.log(onlinestatus);
 
   //  FILTER BUTTON
 
@@ -21,9 +31,6 @@ const Body = () => {
     // setListOfRestaurants(filteredList);
     setFilterRestaurants(filteredList);
   };
-
-  let url =
-    "https://www.swiggy.com/dapi/restaurants/list/v5?lat=12.9351929&lng=77.62448069999999";
 
   // DATA FETCH  USEEFFECT
 
@@ -61,26 +68,42 @@ const Body = () => {
 
   console.log("body rendered each time when ever change in state variable");
 
-  // CONDITONAL RENDERING
+  // online offline
+
+  if (!onlinestatus) {
+    return <h1>Looks like Ur internet is broken</h1>;
+  }
   if (listOfRestaurants.length === 0) {
+    // CONDITONAL RENDERING
     return <ShimmerUi />;
   }
   console.log(listOfRestaurants);
 
   return (
     <div className="body">
-      <div className="search">
+      <div className="text-center flex justify-around m-2">
         {/* FILTER BUTTON  */}
         <button
-          className="btn"
+          className="px-2 py-1 bg-blue-100 rounded-lg"
           onClick={(e) => {
             handleClick(e);
           }}
         >
           Filter
         </button>
-        <form className="form">
+        <div>
           <input
+            className="h-[30px] mx-2 bg-blue-100 rounded-lg px-2"
+            type="text"
+            name="LoggedUser"
+            id=""
+            value={LoggedUser}
+            onChange={(e) => setUserName(e.target.value)}
+          />
+        </div>
+        <form className="text-center ">
+          <input
+            className="h-[30px] mx-2 bg-blue-100 rounded-lg px-2"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             type="text"
@@ -89,6 +112,7 @@ const Body = () => {
             id=""
           />
           <button
+            className="px-2 py-1 bg-blue-100 rounded-lg"
             onClick={(e) => {
               handleSearch(e);
             }}
@@ -98,7 +122,7 @@ const Body = () => {
           </button>
         </form>
       </div>
-      <div className="res_container">
+      <div className="p-1 flex justify-evenly flex-wrap">
         {filterRestaurants.map((val) => {
           return (
             <Link
@@ -106,15 +130,27 @@ const Body = () => {
               className="aLink"
               to={"/restaurants/" + val.info.id}
             >
-              <RestaurantCard
-                id={val.info.id}
-                cloudinaryImageId={val.info.cloudinaryImageId}
-                title={val.info.name}
-                costForTwo={val.info.costForTwo}
-                cuisines={val.info.cuisines}
-                ratings={val.info.avgRating}
-                delTime={val.info.sla}
-              />
+              {val.info.avgRating > 4.4 ? (
+                <ResCardPromoted
+                  id={val.info.id}
+                  cloudinaryImageId={val.info.cloudinaryImageId}
+                  title={val.info.name}
+                  costForTwo={val.info.costForTwo}
+                  cuisines={val.info.cuisines}
+                  ratings={val.info.avgRating}
+                  delTime={val.info.sla}
+                />
+              ) : (
+                <RestaurantCard
+                  id={val.info.id}
+                  cloudinaryImageId={val.info.cloudinaryImageId}
+                  title={val.info.name}
+                  costForTwo={val.info.costForTwo}
+                  cuisines={val.info.cuisines}
+                  ratings={val.info.avgRating}
+                  delTime={val.info.sla}
+                />
+              )}
             </Link>
           );
         })}

@@ -1,66 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { restaurant_Url } from "../utils/data";
+import React, { useState } from "react";
 import ShimmerUi from "./ShimmerUi";
-// import ResMenuItem from "./ResMenuItem";
+
 import { useParams } from "react-router-dom";
+import useRestaurantMenu from "../utils/useRestaurantMenu";
+import RestCategory from "./RestCategory";
 
 const ResMenu = () => {
-  const [resInfo, setResInfo] = useState([]);
-  const [resMenu, setResMenu] = useState([]);
+  const [showIndex, setShowIndex] = useState(null);
   let { id } = useParams();
 
-  useEffect(() => {
-    fetchMenu();
-  }, []);
+  let { resInfo, jData } = useRestaurantMenu(id);
 
-  let fetchMenu = async () => {
-    let data = await fetch(restaurant_Url + id);
-    let json = await data.json();
-    console.log(restaurant_Url + id);
+  console.log(resInfo, jData);
 
-    setResMenu(
-      json?.data?.cards[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards[2]?.card
-        ?.card?.itemCards ||
-        json?.data?.cards[3]?.groupedCard?.cardGroupMap?.REGULAR?.cards[2]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[2]?.groupedCard?.cardGroupMap?.REGULAR?.cards[2]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[1]?.groupedCard?.cardGroupMap?.REGULAR?.cards[2]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[0]?.groupedCard?.cardGroupMap?.REGULAR?.cards[2]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[3]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[2]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[1]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[0]?.groupedCard?.cardGroupMap?.REGULAR?.cards[1]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards[0]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[3]?.groupedCard?.cardGroupMap?.REGULAR?.cards[0]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[2]?.groupedCard?.cardGroupMap?.REGULAR?.cards[0]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[1]?.groupedCard?.cardGroupMap?.REGULAR?.cards[0]?.card
-          ?.card?.itemCards ||
-        json?.data?.cards[0]?.groupedCard?.cardGroupMap?.REGULAR?.cards[0]?.card
-          ?.card?.itemCards
-    );
-
-    setResInfo(
-      json?.data?.cards[0]?.card?.card?.info ||
-        json?.data?.cards[1]?.card?.card?.info ||
-        json?.data?.cards[2]?.card?.card?.info ||
-        json?.data?.cards[3]?.card?.card?.info
-    );
-  };
-
-  console.log(resMenu);
-  console.log(resInfo);
+  // let { itemCards } = jData?.card?.card;
+  // console.log(itemCards);
 
   if (resInfo.length === 0) {
     return <ShimmerUi />;
@@ -68,24 +22,24 @@ const ResMenu = () => {
 
   return (
     <div>
-      <div className="menu">
-        <h1>{resInfo.name}</h1>
+      <div className="text-center m-2">
+        <h1 className="font-bold mb-2">{resInfo.name}</h1>
         <h3>{resInfo.cuisines.join(", ")}</h3>
         <p>₹ {+resInfo.costForTwo / 200}</p>
         <p>{resInfo.sla.deliveryTime}</p>
       </div>
       <div>
-        <ul>
-          {resMenu.map((val, i) => {
-            return (
-              <li key={i}>
-                {val?.card?.info?.name} -₹
-                {val?.card?.info?.price / 100 ||
-                  val?.card?.info?.defaultPrice / 100}
-              </li>
-            );
-          })}
-        </ul>
+        {/* categories accordian */}
+        {jData.map((val, index) => {
+          return (
+            <RestCategory
+              key={val?.card?.card?.title}
+              item={val}
+              showItem={index === showIndex && true}
+              setShowIndex={() => setShowIndex(index)}
+            />
+          );
+        })}
       </div>
     </div>
   );
