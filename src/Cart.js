@@ -26,7 +26,7 @@ const Cart = () => {
     <div className="text-center">
       <h1 className="text-center font-bold">Cart</h1>
       <button
-        className="bg-red-300 px-1 rounded-md m-2 hover:bg-red-400"
+        className="bg-red-300 px-1 rounded-md m-2 hover:bg-red-400 transition-bg"
         onClick={handleClearCart}
       >
         Clear cart
